@@ -12,8 +12,10 @@ import com.vaadin.ui.Button.ClickListener;
 
 import akka.camel.Message;
 import akka.camel.UntypedConsumerActor;
+import static akka.camel.CamelServiceManager.*;
 
 public class PushApp extends Application {
+
 
 
     private static String[] fields = {"First Name", "Last Name", "Company",
@@ -29,6 +31,20 @@ public class PushApp extends Application {
             "Simons", "Verne", "Scott", "Allison", "Gates", "Rowling",
             "Barks", "Ross", "Schneider", "Tate"};
 
+    static boolean startedCamel = false;
+
+    static public void startCamel() {
+        
+        if (startedCamel == false) {
+
+            startCamelService();
+            startedCamel = true;
+            System.out.println("Starting Camel service");
+        } else {
+            System.out.println("Camel service started already");
+        }
+
+    }
 
     IndexedContainer ic = new IndexedContainer();
 
@@ -38,6 +54,9 @@ public class PushApp extends Application {
     public void init() {
         Window mainWindow = new Window("Icepushaddon Application");// new SplitPanel());
         setMainWindow(mainWindow);
+
+        startCamel();
+
 
         // Add the push component
         mainWindow.addComponent(pusher);
@@ -86,8 +105,8 @@ public class PushApp extends Application {
 //                        });
 //                        actor.start();
 
-                        ActorRef files = Actors.actorOf( FileConsumerActor.class);
-                        files.start();
+//                        ActorRef files = Actors.actorOf( FileConsumerActor.class);
+//                        files.start();
                     }
                 }));
 
@@ -108,6 +127,31 @@ public class PushApp extends Application {
         }
 
         table.setContainerDataSource(ic);
+
+//        ActorRef files = Actors.actorOf( FileConsumerActor.class);
+//        files.start();
+
+        ActorRef actor = Actors.actorOf(new UntypedActorFactory() {
+            public UntypedActor create() {
+
+                System.out.println("Creating FileConsumerActor");
+
+                return new FileConsumerActor() {
+                    public void doSomething() {
+                        System.out.println("doSomething");
+                        Object id = ic.addItem();
+                        ic.getContainerProperty(id, "First Name").setValue(
+                                fnames[(int) (fnames.length * Math.random())]);
+                        ic.getContainerProperty(id, "Last Name").setValue(
+                                lnames[(int) (lnames.length * Math.random())]);
+
+                        pusher.push();
+                    }
+                };
+            }
+        });
+        actor.start();
+
 
 
     }
