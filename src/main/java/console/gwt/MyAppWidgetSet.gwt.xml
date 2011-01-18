@@ -7,5 +7,4 @@
 
     <inherits name="org.vaadin.artur.icepush.IcepushaddonWidgetset" />
 
-    <inherits name="console.gwt.ColorPickerWidgetSet" />
 </module>
