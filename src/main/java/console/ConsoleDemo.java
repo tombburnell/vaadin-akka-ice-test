@@ -54,8 +54,7 @@ public class ConsoleDemo extends Application {
         Window mainWindow = new Window("Icepushaddon Application");// new SplitPanel());
         setMainWindow(mainWindow);
 
-        // Add the push component - so we can push stuff to it
-        mainWindow.addComponent(pusher);
+
 
         VerticalLayout root = new VerticalLayout();
 
@@ -64,6 +63,9 @@ public class ConsoleDemo extends Application {
         root.setMargin(true);
 
         mainWindow.setContent(root);
+
+        // Add the push component - so we can push stuff to it
+        mainWindow.addComponent(pusher);
 
         // Add the topmost component.
         Label title = new Label("WFE console");
