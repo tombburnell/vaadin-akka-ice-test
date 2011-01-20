@@ -24,7 +24,6 @@
             </plugin>
 
 
-
             <plugin>
                 <groupId>org.zeroturnaround</groupId>
                 <artifactId>jrebel-maven-plugin</artifactId>
@@ -46,49 +45,49 @@
  with the server side parts - use the goal jetty:run . -->
 
             <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>gwt-maven-plugin</artifactId>-->
-                <!--<version>1.3-SNAPSHOT</version>-->
-                <!--<configuration>-->
-                    <!--&lt;!&ndash; if you don't specify any modules, the plugin will find them &ndash;&gt;-->
-                    <!--&lt;!&ndash; <modules> <module>console.gwt.ColorPickerWidgetSet</module> </modules> &ndash;&gt;-->
-                    <!--<webappDirectory>${project.build.directory}/${project.build.finalName}/VAADIN/widgetsets-->
-                    <!--</webappDirectory>-->
-                    <!--&lt;!&ndash; On Mac running Snow Leopard, add "-d32" &ndash;&gt;-->
-                    <!--&lt;!&ndash; This causes error messages (but build works) in phase "package": two processes would use the same debug-->
-                   <!--port &ndash;&gt;-->
-                    <!--&lt;!&ndash;extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs &ndash;&gt;-->
-                    <!--<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>-->
-                    <!--<runTarget>console</runTarget>-->
-                    <!--<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>-->
-                    <!--<noServer>true</noServer>-->
-                    <!--<port>8080</port>-->
-                    <!--<soyc>false</soyc>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>resources</goal>-->
-                            <!--<goal>compile</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
+            <!--<groupId>org.codehaus.mojo</groupId>-->
+            <!--<artifactId>gwt-maven-plugin</artifactId>-->
+            <!--<version>1.3-SNAPSHOT</version>-->
+            <!--<configuration>-->
+            <!--&lt;!&ndash; if you don't specify any modules, the plugin will find them &ndash;&gt;-->
+            <!--&lt;!&ndash; <modules> <module>console.gwt.ColorPickerWidgetSet</module> </modules> &ndash;&gt;-->
+            <!--<webappDirectory>${project.build.directory}/${project.build.finalName}/VAADIN/widgetsets-->
+            <!--</webappDirectory>-->
+            <!--&lt;!&ndash; On Mac running Snow Leopard, add "-d32" &ndash;&gt;-->
+            <!--&lt;!&ndash; This causes error messages (but build works) in phase "package": two processes would use the same debug-->
+            <!--port &ndash;&gt;-->
+            <!--&lt;!&ndash;extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs &ndash;&gt;-->
+            <!--<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>-->
+            <!--<runTarget>console</runTarget>-->
+            <!--<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>-->
+            <!--<noServer>true</noServer>-->
+            <!--<port>8080</port>-->
+            <!--<soyc>false</soyc>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>resources</goal>-->
+            <!--<goal>compile</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
             <!--</plugin>-->
             <!--<plugin>-->
-                <!--<groupId>com.vaadin</groupId>-->
-                <!--<artifactId>vaadin-maven-plugin</artifactId>-->
-                <!--<version>1.0.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<configuration>-->
-                            <!--&lt;!&ndash; if you don't specify any modules, the plugin will find them &ndash;&gt;-->
-                            <!--&lt;!&ndash; <modules> <module>console.gwt.ColorPickerWidgetSet</module> </modules> &ndash;&gt;-->
-                        <!--</configuration>-->
-                        <!--<goals>-->
-                            <!--&lt;!&ndash;<goal>update-widgetset</goal>&ndash;&gt;-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
+            <!--<groupId>com.vaadin</groupId>-->
+            <!--<artifactId>vaadin-maven-plugin</artifactId>-->
+            <!--<version>1.0.1</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<configuration>-->
+            <!--&lt;!&ndash; if you don't specify any modules, the plugin will find them &ndash;&gt;-->
+            <!--&lt;!&ndash; <modules> <module>console.gwt.ColorPickerWidgetSet</module> </modules> &ndash;&gt;-->
+            <!--</configuration>-->
+            <!--<goals>-->
+            <!--&lt;!&ndash;<goal>update-widgetset</goal>&ndash;&gt;-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
             <!--</plugin>-->
 
             <!-- A simple Jetty test server at http://localhost:8080/console can be launched with the Maven goal jetty:run
@@ -134,12 +133,6 @@
         </repository>
 
 
-        <!--<repository>-->
-            <!--<id>Akka</id>-->
-            <!--<name>Akka Maven2 Repository</name>-->
-            <!--<url>http://akka.io/repository/</url>-->
-        <!--</repository>-->
-
         <repository>
             <id>Multiverse</id>
             <name>Multiverse Maven2 Repository</name>
@@ -160,15 +153,9 @@
 
 
         <repository>
-            <id>vaadin-addons</id>
-            <url>http://maven.vaadin.com/vaadin-addons</url>
-        </repository>
-
-
-        <repository>
             <id>Akka</id>
             <name>Akka Maven2 Repository</name>
-            <url>http://akka.io/repository/ </url>
+            <url>http://akka.io/repository/</url>
         </repository>
 
     </repositories>
@@ -220,7 +207,7 @@
             <artifactId>akka-actor</artifactId>
             <version>1.0-RC3</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>icepush</artifactId>
@@ -240,7 +227,6 @@
             <artifactId>icepush-gwt</artifactId>
             <version>2.0.0</version>
         </dependency>
-
 
 
         <dependency>
