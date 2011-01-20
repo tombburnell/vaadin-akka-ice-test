@@ -1,8 +1,5 @@
 package console;
 
-import akka.camel.Message;
-import akka.camel.UntypedConsumerActor;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -13,45 +10,18 @@ import java.util.Map;
 /**
  * Created by IntelliJ IDEA.
  * User: tom
- * Date: Jan 18, 2011
- * Time: 1:04:23 AM
+ * Date: Jan 20, 2011
+ * Time: 7:41:38 PM
  * To change this template use File | Settings | File Templates.
  */
+public class QueryStringMapper {
 
-public class RestConsumerActor extends UntypedConsumerActor {
-    public String getEndpointUri() {
-//     return "file:data/input/actor";
-        return "jetty:http://localhost:8012/camel/default";
+    public QueryStringMapper() {
 
     }
-
-    public void onReceive(Object message) {
-        Message msg = (Message) message;
-        String body = msg.getBodyAs(String.class);
-
-        System.out.println(String.format("received %s", body));
-
-        Map<String, List<String>> params = null;
-        try {
-            params = convertUrlToMap(body);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(String.format("received %s", params));
-
-        doSomething(params);
-
-        getContext().replySafe(String.format("Hello %s", body));
-
-    }
-
-
-    public void doSomething(Map<String, List<String>> body)  {  }
-
-
 
     //convert provided query string to a map
+
     Map<String, List<String>> convertUrlToMap(String query) throws UnsupportedEncodingException {
 
         Map<String, List<String>> params = new HashMap<String, List<String>>();
@@ -67,8 +37,7 @@ public class RestConsumerActor extends UntypedConsumerActor {
             }
             values.add(value);
         }
+
         return params;
     }
-
-
 }

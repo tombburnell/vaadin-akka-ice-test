@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.actor.Actors;
 import akka.actor.UntypedActor;
 import akka.actor.UntypedActorFactory;
+import akka.camel.CamelContextManager;
 import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -11,6 +12,10 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import console.actor.MyConsumerActor;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.spring.spi.ApplicationContextRegistry;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.vaadin.artur.icepush.ICEPush;
 
 import java.util.Iterator;
@@ -28,10 +33,17 @@ public class ConsoleDemo extends Application {
     static boolean startedCamel = false;
 
     // start the camel service
-    // TODO figure out why this is causing exception
     static public void startCamel() {
 
         if (startedCamel == false) {
+
+            // Create CamelContext with Spring-based registry and custom route builder
+            CamelContextManager.init(new DefaultCamelContext(
+                    new ApplicationContextRegistry(
+                            new ClassPathXmlApplicationContext("/appContext.xml", ConsoleDemo.class)
+                    ))
+            );
+
             startCamelService();
             startedCamel = true;
             System.out.println("Starting Camel service");
@@ -48,12 +60,12 @@ public class ConsoleDemo extends Application {
     @Override
     public void init() {
 
+
         startCamel();
 
 
-        Window mainWindow = new Window("Icepushaddon Application");// new SplitPanel());
+        Window mainWindow = new Window("Icepushaddon Application");
         setMainWindow(mainWindow);
-
 
 
         VerticalLayout root = new VerticalLayout();
@@ -65,6 +77,7 @@ public class ConsoleDemo extends Application {
         mainWindow.setContent(root);
 
         // Add the push component - so we can push stuff to it
+        // MUST happen after setContent()
         mainWindow.addComponent(pusher);
 
         // Add the topmost component.
@@ -108,12 +121,12 @@ public class ConsoleDemo extends Application {
         transcodeTables.addComponent(taskTable);
 
         // Create table headings
-        taskTable.addContainerProperty("TaskId", Integer.class, null);
-        taskTable.addContainerProperty("Vpid", String.class, null);
-        taskTable.addContainerProperty("Bpid", String.class, null);
-        taskTable.addContainerProperty("Title", String.class, null);
-        taskTable.addContainerProperty("Status", String.class, null);
-        taskTable.addContainerProperty("EcmJobId", Integer.class, null);
+        taskTable.addContainerProperty("id", Integer.class, null);
+        taskTable.addContainerProperty("vpid", String.class, null);
+        taskTable.addContainerProperty("bpid", String.class, null);
+        taskTable.addContainerProperty("title", String.class, null);
+        taskTable.addContainerProperty("status", String.class, null);
+        taskTable.addContainerProperty("jobid", Integer.class, null);
         taskTable.addContainerProperty("percent", Integer.class, null);
 
         //Add some initial rows
@@ -125,7 +138,7 @@ public class ConsoleDemo extends Application {
         Table targetTable = new Table("Target Table");
         transcodeTables.addComponent(targetTable);
 
-        String[] targetFields = {"Target Id", "wfe_profile", "Title"};
+        String[] targetFields = {"id", "wfe_profile", "title"};
         for (String p : targetFields) {
             targetTable.addContainerProperty(p, String.class, null);
         }
@@ -137,54 +150,90 @@ public class ConsoleDemo extends Application {
 
         // Done with PageLayout
 
+
         // Lets create an Actor to Monitor for updates via REST
 
-        ActorRef actor = Actors.actorOf(new UntypedActorFactory() {
+        ActorRef restActor = Actors.actorOf(new UntypedActorFactory() {
             public UntypedActor create() {
 
-                return new RestConsumerActor() {
+                return new MyConsumerActor() {
 
                     public void doSomething(Map<String, List<String>> params) {
-                        List<String> taskIds = params.get("taskId");
-
-                        if (taskIds == null) {
-                            System.out.println("No taskIds provideds");
-                            return;
-                        }
-
-                        for (String taskId : taskIds) {
-                            Integer tId = Integer.parseInt(taskId);
-
-                            Item row = taskTable.getItem(tId);
-
-                            for (String key : params.keySet()) {
-                                if (key.equals("taskId")) {
-                                    continue;
-                                }
-
-                                String value = params.get(key).get(0);
-                                System.out.println("Setting " + key + " to " + value);
-
-                                Property p = taskTable.getContainerProperty(tId, key);
-                                if (p != null) {
-                                    p.setValue(value);
-                                } else {
-                                    System.out.println("No field called " + key);
-                                }
-                            }
-                        }
-
-                        // push the updates to the view
-                        pusher.push();
+                        updateTable(params);
                     }
                 };
             }
         });
 
-        actor.start();
+        restActor.start();
+
+
+        // Create an actor to listen to monitor for updates via JMS topic
+
+        ActorRef jmsActor = Actors.actorOf(new UntypedActorFactory() {
+            public UntypedActor create() {
+
+                return new MyConsumerActor() {
+
+                    public String getEndpointUri() {
+                        return "jms:topic:yo";
+                    }
+
+                    public void doSomething(Map<String, List<String>> params) {
+                        updateTable(params);
+                    }
+                };
+            }
+        });
+
+        jmsActor.start();
+
 
     }
 
+
+    /*
+    update table based on message params
+
+    */
+
+    public void updateTable(Map<String, List<String>> params) {
+        List<String> taskIds = params.get("id");
+
+        if (taskIds == null) {
+            System.out.println("No taskIds provideds");
+            return;
+        }
+
+        for (String taskId : taskIds) {
+            Integer tId = Integer.parseInt(taskId);
+
+            Item row = taskTable.getItem(tId);
+
+            for (String key : params.keySet()) {
+                if (key.equals("id")) {
+                    continue;
+                }
+
+                String value = params.get(key).get(0);
+                System.out.println("Setting " + key + " to " + value);
+
+                Property p = taskTable.getContainerProperty(tId, key);
+                if (p != null) {
+                    p.setValue(value);
+                } else {
+                    System.out.println("No field called " + key);
+                }
+            }
+        }
+
+        // push the updates to the view
+        pusher.push();
+
+    }
+
+
+    // simulate updates to percent complete column
 
     public class BackgroundThread extends Thread {
 
@@ -208,7 +257,7 @@ public class ConsoleDemo extends Application {
 
                     // increate the Status if complete
                     if ((Integer) p.getValue() == 100) {
-                        taskTable.getContainerProperty(iid, "Status").setValue("Completed");
+                        taskTable.getContainerProperty(iid, "status").setValue("Completed");
                     }
 
                     // push changes as we go
