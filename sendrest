@@ -1,0 +1,5 @@
+echo $1
+echo $2
+
+curl --data "taskId=$1&$2" http://localhost:8012/camel/default
+
