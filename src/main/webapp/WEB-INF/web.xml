@@ -14,7 +14,7 @@
         <init-param>
             <description>Vaadin application class to start</description>
             <param-name>application</param-name>
-            <param-value>console.PushApp</param-value>
+            <param-value>console.ConsoleDemo</param-value>
         </init-param>
         <!--<init-param>-->
             <!--<param-name>widgetset</param-name>-->
