@@ -1,21 +1,23 @@
 package console;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.Actors;
+import akka.actor.UntypedActor;
+import akka.actor.UntypedActorFactory;
+import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.vaadin.artur.icepush.ICEPush;
-
-import com.vaadin.Application;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import org.vaadin.artur.icepush.ICEPush;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static akka.camel.CamelServiceManager.*;
+import static akka.camel.CamelServiceManager.startCamelService;
 
 public class ConsoleDemo extends Application {
 
@@ -81,23 +83,14 @@ public class ConsoleDemo extends Application {
 
 
         // Add a button for starting some example background work
-        root.addComponent( new Button("Do stuff in the background", new ClickListener() {
+        root.addComponent(new Button("Do stuff in the background", new ClickListener() {
             public void buttonClick(ClickEvent event) {
-                getMainWindow() .addComponent( new Label( "Waiting for background process to complete..."));
+                getMainWindow().addComponent(new Label("Waiting for background process to complete..."));
 
                 // trigger thread when we click it
                 new BackgroundThread().start();
             }
         }));
-
-
-        // A wrapper with a caption for the login form
-//        Panel loginPanel = new Panel("Login");
-//        loginPanel.setWidth("250px");
-//
-//        LoginForm login = new LoginForm();
-//        loginPanel.addComponent(login);
-//        root.addComponent(loginPanel);
 
 
         HorizontalLayout transcodeTables = new HorizontalLayout();
@@ -123,16 +116,7 @@ public class ConsoleDemo extends Application {
 
         //Add some initial rows
         for (int i = 0; i < 10; i++) {
-            System.out.println("Adding item " + i);
-            taskTable.addItem(new Object[]{
-                    new Integer(i),
-                    "v00" + i,
-                    "b00" + i,
-                    "Neighbours ep: " + i,
-                    "InProgress",
-                    "123",
-                    "50"
-            }, new Integer(i));
+            taskTable.addItem(new Object[]{new Integer(i), "v00" + i, "b00" + i, "Neighbours ep: " + i, "InProgress", "123", "50"}, new Integer(i));
         }
 
 
@@ -157,34 +141,33 @@ public class ConsoleDemo extends Application {
             public UntypedActor create() {
 
                 return new RestConsumerActor() {
+
                     public void doSomething(Map<String, List<String>> params) {
-                        System.out.println("doSomething " + params);
                         List<String> taskIds = params.get("taskId");
 
-                        // If we have provided at least 1 taskId
-                        if (taskIds != null) {
-                            for (String taskId : taskIds) {
-                                Integer tId = Integer.parseInt(taskId);
+                        if (taskIds == null) {
+                            System.out.println("No taskIds provideds");
+                            return;
+                        }
 
-                                Item row = taskTable.getItem(tId);
+                        for (String taskId : taskIds) {
+                            Integer tId = Integer.parseInt(taskId);
 
-                                for (String key : params.keySet()) {
-                                    System.out.println("Processing '" + key + "'");
+                            Item row = taskTable.getItem(tId);
 
-                                    if (key.equals("taskId")) {
-                                        System.out.println("Skipping " + key);
-                                        continue;
-                                    }
-                                    String value = params.get(key).get(0);
-                                    System.out.println("Setting " + key + " to " + value); //+params.get(key).get(0));
+                            for (String key : params.keySet()) {
+                                if (key.equals("taskId")) {
+                                    continue;
+                                }
 
-                                    //Property p = row.getItemProperty(key);
-                                    Property p = taskTable.getContainerProperty(tId, key);
-                                    if (p != null) {
-                                        p.setValue(value);//params.get(key).get(0));
-                                    } else {
-                                        System.out.println("No field called " + key);
-                                    }
+                                String value = params.get(key).get(0);
+                                System.out.println("Setting " + key + " to " + value);
+
+                                Property p = taskTable.getContainerProperty(tId, key);
+                                if (p != null) {
+                                    p.setValue(value);
+                                } else {
+                                    System.out.println("No field called " + key);
                                 }
                             }
                         }
@@ -195,10 +178,11 @@ public class ConsoleDemo extends Application {
                 };
             }
         });
+
         actor.start();
 
-
     }
+
 
     public class BackgroundThread extends Thread {
 
@@ -212,7 +196,7 @@ public class ConsoleDemo extends Application {
 
                 }
                 for (Iterator ii = taskTable.getItemIds().iterator(); ii.hasNext();) {
-                    
+
                     // Get the current item identifier, which is an integer.
                     int iid = (Integer) ii.next();
                     Property p = taskTable.getContainerProperty(iid, "percent");
@@ -229,7 +213,6 @@ public class ConsoleDemo extends Application {
                     pusher.push();
                 }
             }
-
 
             // Tell them we are done
             synchronized (ConsoleDemo.this) {
