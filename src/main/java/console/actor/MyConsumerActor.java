@@ -43,7 +43,8 @@ public class MyConsumerActor extends UntypedConsumerActor {
             e.printStackTrace();
         }
 
-        getContext().replySafe(String.format("Hello %s", body));
+        System.out.println("Done, replying");
+        getContext().replySafe(String.format("Hello %s\n", body));
 
     }
 

@@ -282,12 +282,6 @@
         </dependency>
 
         <dependency>
-            <groupId>se.scalablesolutions.akka</groupId>
-            <artifactId>akka-actor</artifactId>
-            <version>1.0-RC3</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.vaadin.addons</groupId>
             <artifactId>icepush</artifactId>
             <version>0.2.0</version>
@@ -307,6 +301,12 @@
             <version>2.0.0</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>se.scalablesolutions.akka</groupId>
+            <artifactId>akka-http</artifactId>
+            <version>1.0-RC3</version>
+        </dependency>
 
         <dependency>
             <groupId>se.scalablesolutions.akka</groupId>

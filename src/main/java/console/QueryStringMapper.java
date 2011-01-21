@@ -22,7 +22,7 @@ public class QueryStringMapper {
 
     //convert provided query string to a map
 
-    Map<String, List<String>> convertUrlToMap(String query) throws UnsupportedEncodingException {
+    public Map<String, List<String>> convertUrlToMap(String query) throws UnsupportedEncodingException {
 
         Map<String, List<String>> params = new HashMap<String, List<String>>();
 

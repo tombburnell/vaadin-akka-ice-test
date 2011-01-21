@@ -176,7 +176,7 @@ public class ConsoleDemo extends Application {
                 return new MyConsumerActor() {
 
                     public String getEndpointUri() {
-                        return "jms:topic:yo";
+                        return "jms:topic:forge";
                     }
 
                     public void doSomething(Map<String, List<String>> params) {
