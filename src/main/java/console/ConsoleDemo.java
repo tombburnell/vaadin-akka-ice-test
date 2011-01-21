@@ -147,7 +147,6 @@ public class ConsoleDemo extends Application {
             targetTable.addItem(new Object[]{i, "flv_avc1", "Neighbours"}, new Integer(i));
         }
 
-
         // Done with PageLayout
 
 
@@ -158,7 +157,11 @@ public class ConsoleDemo extends Application {
 
                 return new MyConsumerActor() {
 
-                    public void doSomething(Map<String, List<String>> params) {
+                    public String getEndpointUri() {
+                        return "jetty:http://localhost:8012/camel/default";
+                    }
+
+                    public void processParams(Map<String, List<String>> params) {
                         updateTable(params);
                     }
                 };
@@ -179,7 +182,7 @@ public class ConsoleDemo extends Application {
                         return "jms:topic:forge";
                     }
 
-                    public void doSomething(Map<String, List<String>> params) {
+                    public void processParams(Map<String, List<String>> params) {
                         updateTable(params);
                     }
                 };

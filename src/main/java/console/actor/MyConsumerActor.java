@@ -37,7 +37,7 @@ public class MyConsumerActor extends UntypedConsumerActor {
 
             System.out.println(String.format("received %s", params));
 
-            doSomething(params);
+            processParams(params);
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class MyConsumerActor extends UntypedConsumerActor {
 
     }
 
-    public void doSomething(Map<String, List<String>> body) {
+    public void processParams(Map<String, List<String>> body) {
     }
 
 }
