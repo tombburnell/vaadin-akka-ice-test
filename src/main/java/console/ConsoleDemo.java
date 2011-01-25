@@ -5,6 +5,7 @@ import akka.actor.Actors;
 import akka.actor.UntypedActor;
 import akka.actor.UntypedActorFactory;
 import akka.camel.CamelContextManager;
+import akka.camel.UntypedProducerActor;
 import com.vaadin.Application;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -12,9 +13,12 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import console.ExampleComponents.RichTextExample;
+import console.ExampleComponents.TextExample;
 import console.actor.MyConsumerActor;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
+import org.joda.time.DateTime;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.vaadin.artur.icepush.ICEPush;
 
@@ -56,24 +60,16 @@ public class ConsoleDemo extends Application {
     // For displaying our tasks
     Table taskTable = new Table("Task Table");
 
-
     @Override
     public void init() {
 
-
         startCamel();
-
 
         Window mainWindow = new Window("Icepushaddon Application");
         setMainWindow(mainWindow);
-
-
         VerticalLayout root = new VerticalLayout();
-
-        //turn on spacing and margin (configure in css)
         root.setSpacing(true);
         root.setMargin(true);
-
         mainWindow.setContent(root);
 
         // Add the push component - so we can push stuff to it
@@ -85,7 +81,6 @@ public class ConsoleDemo extends Application {
         title.setWidth(400, Sizeable.UNITS_PIXELS);
         root.addComponent(title);
 
-
         // Create a sample menu bar
         final MenuBar menubar = new MenuBar();
         root.addComponent(menubar);
@@ -96,28 +91,23 @@ public class ConsoleDemo extends Application {
         menubar.addItem("Subtitles", null, null);
         menubar.addItem("Publication", null, null);
 
-
         // Add a button for starting some example background work
         root.addComponent(new Button("Do stuff in the background", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 getMainWindow().addComponent(new Label("Waiting for background process to complete..."));
-
                 // trigger thread when we click it
                 new BackgroundThread().start();
             }
         }));
 
-
         HorizontalLayout transcodeTables = new HorizontalLayout();
         transcodeTables.setSpacing(true);
         transcodeTables.setMargin(true);
         root.addComponent(transcodeTables);
-
         taskTable.setWidth(400, Sizeable.UNITS_PIXELS);
         taskTable.setSizeFull();
-
         // increase from default of 2 to smooth out scrolling
-//        taskTable.setCacheRate(5);
+        // taskTable.setCacheRate(5);
         transcodeTables.addComponent(taskTable);
 
         // Create table headings
@@ -129,25 +119,25 @@ public class ConsoleDemo extends Application {
         taskTable.addContainerProperty("jobid", Integer.class, null);
         taskTable.addContainerProperty("percent", Integer.class, null);
 
-        //Add some initial rows
+        //Add some initial transcode data
         for (int i = 0; i < 10; i++) {
-            taskTable.addItem(new Object[]{new Integer(i), "v00" + i, "b00" + i, "Neighbours ep: " + i, "InProgress", "123", "50"}, new Integer(i));
+            taskTable.addItem(new Object[]{new Integer(i), "v00" + i, "b00" + i, "Eastenders ep: " + i, "InProgress", "123", "50"}, new Integer(i));
         }
-
 
         Table targetTable = new Table("Target Table");
         transcodeTables.addComponent(targetTable);
-
         String[] targetFields = {"id", "wfe_profile", "title"};
         for (String p : targetFields) {
             targetTable.addContainerProperty(p, String.class, null);
         }
         for (int i = 0; i < 10; i++) {
             System.out.println("Adding target item " + i);
-            targetTable.addItem(new Object[]{i, "flv_avc1", "Neighbours"}, new Integer(i));
+            targetTable.addItem(new Object[]{i, "flv_avc1_med", "Eastenders"}, new Integer(i));
         }
 
+        //
         // Done with PageLayout
+        //
 
 
         // Lets create an Actor to Monitor for updates via REST
@@ -192,6 +182,41 @@ public class ConsoleDemo extends Application {
         jmsActor.start();
 
 
+        // actor to fire off messages to queue 
+        final ActorRef jmsProducer = Actors.actorOf(new UntypedActorFactory() {
+
+            public UntypedActor create() {
+
+                return new UntypedProducerActor() {
+                    public String getEndpointUri() {
+                        return "jms:topic:forge";
+                    }
+
+                    @Override
+                    public boolean isOneway() {
+                        return true;
+                    }
+
+                };
+            }
+        });
+
+
+        jmsProducer.start();
+
+
+        // add a text box and forward any messages to forge queue
+        TextExample textArea = new TextExample() {
+            public void processText(String text) {
+                jmsProducer.sendOneWay(text);
+            }
+        };
+        transcodeTables.addComponent(textArea);
+
+        // add a richtextbox
+        RichTextExample richText = new RichTextExample();
+        root.addComponent(richText);
+
     }
 
 
@@ -199,6 +224,9 @@ public class ConsoleDemo extends Application {
     update table based on message params
 
     */
+
+    DateTime lastTime = new DateTime();
+    Integer interval = 0;
 
     public void updateTable(Map<String, List<String>> params) {
         List<String> taskIds = params.get("id");
@@ -230,8 +258,14 @@ public class ConsoleDemo extends Application {
             }
         }
 
-        // push the updates to the view
-        pusher.push();
+        DateTime now = new DateTime();
+        if (now.getSecondOfDay() >= lastTime.getSecondOfDay() + interval) {
+            // push the updates to the view
+            pusher.push();
+            lastTime = now;
+
+        }
+
 
     }
 
