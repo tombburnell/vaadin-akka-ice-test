@@ -1,0 +1,6 @@
+
+for i in $(jot - 1 100); do 
+   curl -d "id=1&percent=$i" localhost:8012/camel/default; perl -e 'select(undef,undef,undef,0.2);'; echo  
+   curl -d "id=5&percent=$i" localhost:8012/camel/default; perl -e 'select(undef,undef,undef,0.2);'; echo 
+ done 
+
