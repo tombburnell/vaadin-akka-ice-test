@@ -364,6 +364,22 @@
             <version>1.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jpathwatch</groupId>
+            <artifactId>jpathwatch</artifactId>
+            <version>0.9.3-rc1</version>
+            <!--<scope>system</scope>-->
+            <!--<systemPath>path to ... swingx-0.9.3.jar</systemPath>-->
+        </dependency>
+
+        <dependency>
+            <groupId>org.jpw</groupId>
+            <artifactId>jpw</artifactId>
+            <version>0.9.3-rc1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/jpathwatch-0-93-rc1.jar</systemPath>
+        </dependency>
+
 
     </dependencies>
 

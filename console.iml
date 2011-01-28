@@ -9,7 +9,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
         </webroots>
-        <context-artifact name="console:war exploded" />
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
@@ -137,6 +136,8 @@
     <orderEntry type="library" name="Maven: backport-util-concurrent:backport-util-concurrent:2.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.0_spec:1.0" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:1.6" level="project" />
+    <orderEntry type="library" name="Maven: org.jpathwatch:jpathwatch:0.9.3-rc1" level="project" />
+    <orderEntry type="library" name="Maven: org.jpw:jpw:0.9.3-rc1" level="project" />
   </component>
 </module>
 

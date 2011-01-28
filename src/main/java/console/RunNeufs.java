@@ -12,8 +12,8 @@ public class RunNeufs {
 
     public static void main(String[] args) {
 
-        GateWay gateWay = new GateWay();
-        gateWay.start();
+        Neufs neufs = new Neufs();
+        neufs.start();
     }
 
 
