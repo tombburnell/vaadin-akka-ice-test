@@ -111,6 +111,25 @@ public class TranscodePanel extends VerticalLayout {
 
         restActor.start();
 
+        // Lets create an Actor to Monitor for updates via REST
+
+        ActorRef fileActor = Actors.actorOf(new UntypedActorFactory() {
+            public UntypedActor create() {
+
+                return new MyConsumerActor() {
+
+                    public String getEndpointUri() {
+                        return "file:/tmp/input";
+                    }
+
+                    public void processParams(Map<String, List<String>> params) {
+                        updateTable(params);
+                    }
+                };
+            }
+        });
+
+        fileActor.start();
 
         // Create an actor to listen to monitor for updates via JMS topic
 

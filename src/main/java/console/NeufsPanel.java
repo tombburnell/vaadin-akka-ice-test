@@ -41,16 +41,8 @@ public class NeufsPanel extends VerticalLayout {
 
         fileChangeTable.addContainerProperty("id", Integer.class, null);
         fileChangeTable.addContainerProperty("change", String.class, null);
-
         fileChangeTable.setWidth("300");
-
-        fileChangeTable.sort(new Object[]{"id"}, new boolean[]{false});
-
-//        for (int i = 0; i < 10; i++) {
-//            String f = "init-"+i;
-//            System.out.println("Adding filename item " + f);
-//            fileChangeTable.addItem(new Object[]{ f }, new Integer(i));
-//        }
+        fileChangeTable.sort(new Object[]{"id"}, new boolean[]{true});
 
 
         // Create an actor to listen to monitor for updates via JMS topic
@@ -62,14 +54,13 @@ public class NeufsPanel extends VerticalLayout {
 
                     public String getEndpointUri() {
                         return "jms:topic:neufs";
-//                        return "file:/tmp/neufs";
                     }
 
                     public void onReceive(Object message) {
                         Message msg = (Message) message;
                         log.info("Got message about file: " + msg);
                         final String body = msg.getBodyAs(String.class);
-                        //                       String filename = (String) msg.getHeader("CamelFileName");
+                        //     String filename = (String) msg.getHeader("CamelFileName");
                         String filename = body;
 
                         Integer y;
