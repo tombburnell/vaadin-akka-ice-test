@@ -59,7 +59,7 @@ public class NeufsPanel extends VerticalLayout {
                     public void onReceive(Object message) {
                         Message msg = (Message) message;
                         log.info("Got message about file: " + msg);
-                        final String body = msg.getBodyAs(String.class);
+                        final String body = (String) msg.getBodyAs(String.class);
                         //     String filename = (String) msg.getHeader("CamelFileName");
                         String filename = body;
 
@@ -72,7 +72,7 @@ public class NeufsPanel extends VerticalLayout {
 
                         log.info("Got message about file: " + filename + "adding as id" + y);
 
-//                        Integer lastId = (Integer) fileChangeTable.lastItemId();
+//                        Integer lastId = (Integer) dashTable.lastItemId();
 //                        if (null == lastId) lastId= 0;
                         synchronized (getApplication()) {
                             System.out.println("table=" + fileChangeTable + " y=" + y + "file = " + filename);

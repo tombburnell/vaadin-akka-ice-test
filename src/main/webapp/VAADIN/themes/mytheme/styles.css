@@ -1,2 +1,76 @@
 @import url(../reindeer/styles.css);
 
+.v-app {
+/*background: yellow;*/
+    background-image: url("flight-control.jpg");
+}
+
+h1 {
+    image: url("flight-control-logo.png");
+    color: #8f7239;
+
+}
+
+v-label h1 {
+    background-image: url("wfe-control-logo.png");
+    color: #8f7239;
+    font-size: 28px;
+}
+
+.h2 {
+    color: #FFF;
+    font-size: 20px;
+}
+
+.h1 {
+    background-repeat: no-repeat;
+    height: 117px;
+    width: 400px;
+    background-image: url("wfe-control-logo3.png");
+    font-size: 0px; /*color:white;*/
+/*text-shadow: 0 0 0.2em #bcd3de, 0 0 0.2em #bcd3de,*/
+/*0 0 0.2em #bcd3de;*/
+/*font-size: 28px;*/
+/*text-decoration:underline;*/
+/*font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;*/
+/*background0B3758;*/
+/*text-align:center;*/
+/*vertical-align:text-middle;*/
+/*border:2px solid white;*/
+}
+
+v-table {
+/*padding: 10px;*/
+/*background-color: #fe8;*/
+}
+
+v-table td {
+/*padding: 10px;*/
+/*margin: 20px;*/
+/*background-color: #fe8;*/
+}
+
+.v-table-header {
+    background-color: #fe8;
+    font-size: 12px;
+}
+
+.v-table-row {
+/*padding: 10px;*/
+/*margin: 20px;*/
+/*background-color: #fe8;*/
+
+}
+
+.v-table-cell-content {
+    padding: 5px; /*margin: 20px;*/
+    font-size: 14px;
+    font-family: "Tahoma", "Lucida Grande";
+
+}
+
+.v-table-cell-content-red-background {
+    background-color: #F44;
+
+}
+

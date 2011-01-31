@@ -41,7 +41,7 @@ public class GateWay {
         // Create CamelContext with Spring-based registry and custom route builder
         CamelContextManager.init(new DefaultCamelContext(
                 new ApplicationContextRegistry(
-                        new ClassPathXmlApplicationContext("/appContext.xml", ConsoleDemo.class)
+                        new ClassPathXmlApplicationContext("appContext.xml", ConsoleDemo.class)
                 ))
         );
 

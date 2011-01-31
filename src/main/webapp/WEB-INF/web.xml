@@ -35,10 +35,6 @@
             <param-name>application</param-name>
             <param-value>console.ConsoleDemo</param-value>
         </init-param>
-        <!--<init-param>-->
-        <!--<param-name>widgetset</param-name>-->
-        <!--<param-value>console.gwt.ColorPickerWidgetSet</param-value>-->
-        <!--</init-param>-->
         <init-param>
             <param-name>widgetset</param-name>
             <param-value>console.gwt.MyAppWidgetSet</param-value>
