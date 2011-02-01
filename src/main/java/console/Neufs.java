@@ -37,7 +37,7 @@ public class Neufs {
         // Create CamelContext with Spring-based registry and custom route builder
         CamelContextManager.init(new DefaultCamelContext(
                 new ApplicationContextRegistry(
-                        new ClassPathXmlApplicationContext("/src/main/resources/appContext.xml", ConsoleDemo.class)
+                        new ClassPathXmlApplicationContext("../appContext.xml", Neufs.class)
                 ))
         );
         startCamelService();
@@ -64,38 +64,8 @@ public class Neufs {
         jmsProducer.start();
 
 
-        // Create an actor to listen to monitor for updates via JMS topic
-
-//        ActorRef jmsConsumer = Actors.actorOf(new UntypedActorFactory() {
-//            public UntypedActor create() {
-//
-//                return new UntypedConsumerActor() {
-//
-//                    public String getEndpointUri() {
-//                        //return "jms:topic:yo";
-//                        return "file:/tmp/neufs";
-//                    }
-//
-//                    public void onReceive(final Object message) {
-//                        Object returnMessage = message;
-//
-//                        // if message contains 'large' save it and forward a modified message
-//                        if (message.toString().contains("large")) {
-//                            returnMessage = "id=0&title=" + saveMessage(message);
-//                        }
-//
-//                        System.out.println("Forwarding message:" + returnMessage);
-//                        jmsProducer.sendOneWay(returnMessage);
-//                    }
-//                };
-//            }
-//        });
-//
-//        jmsConsumer.start();
-
-
         WatchService watchService = FileSystems.getDefault().newWatchService();
-        Path watchedPath = Paths.get("/tmp/neufs");
+        Path watchedPath = Paths.get("/Users/tom/neufs");
 
         WatchKey key = null;
         try {
@@ -110,7 +80,6 @@ public class Neufs {
         }
 
         for (; ;) {
-//            System.out.println("Scanning");
 
             // take() will block until a file has been created/deleted
             WatchKey signalledKey;

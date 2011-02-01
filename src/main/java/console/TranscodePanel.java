@@ -11,23 +11,21 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import console.ExampleComponents.RichTextExample;
 import console.ExampleComponents.TextExample;
+import console.ExampleComponents.TranscodeTableStyle;
 import console.actor.MyConsumerActor;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.artur.icepush.ICEPush;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tom
- * Date: Jan 26, 2011
- * Time: 10:59:14 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class TranscodePanel extends VerticalLayout {
 
+    Logger log = LoggerFactory.getLogger(TranscodePanel.class);
 
     // For displaying our tasks
     Table taskTable = new Table("Task Table");
@@ -43,7 +41,7 @@ public class TranscodePanel extends VerticalLayout {
         // Add a button for starting some example background work
         this.addComponent(new Button("Do stuff in the background", new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent
-                                            event) {
+                    event) {
                 TranscodePanel.this.addComponent(new Label("Waiting for background process to complete..."));
                 // trigger thread when we click it
                 new BackgroundThread().start();
@@ -67,13 +65,21 @@ public class TranscodePanel extends VerticalLayout {
         taskTable.addContainerProperty("bpid", String.class, null);
         taskTable.addContainerProperty("title", String.class, null);
         taskTable.addContainerProperty("status", String.class, null);
-        taskTable.addContainerProperty("jobid", Integer.class, null);
+        taskTable.addContainerProperty("jobid", String.class, null);
         taskTable.addContainerProperty("percent", Integer.class, null);
 
         //Add some initial transcode data
-        for (int i = 0; i < 10; i++) {
-            taskTable.addItem(new Object[]{new Integer(i), "v00" + i, "b00" + i, "Eastenders ep: " + i, "InProgress", "123", "50"}, new Integer(i));
+        for (int i = 0; i < 1; i++) {
+            taskTable.addItem(new Object[]{
+                    //           new Integer(i), "v00" + i, "b00" + i, "Eastenders ep: " + i, "InProgress", "123", "0"}, new Integer(i)
+                    new Integer(i), "-", "-", "untitled", "pending", "-", 0}, new Integer(i)
+            );
         }
+        taskTable.setCellStyleGenerator(new TranscodeTableStyle() {
+            public Table getTable() {
+                return taskTable;
+            }
+        });
 
         Table targetTable = new Table("Target Table");
         transcodeTables.addComponent(targetTable);
@@ -82,7 +88,7 @@ public class TranscodePanel extends VerticalLayout {
             targetTable.addContainerProperty(p, String.class, null);
         }
         for (int i = 0; i < 10; i++) {
-            System.out.println("Adding target item " + i);
+            log.info("Adding target item " + i);
             targetTable.addItem(new Object[]{i, "flv_avc1_med", "Eastenders"}, new Integer(i));
         }
 
@@ -199,10 +205,28 @@ public class TranscodePanel extends VerticalLayout {
     Integer interval = 0;
 
     public void updateTable(Map<String, List<String>> params) {
+
+        List<String> housekeep = params.get("housekeep");
+        if (housekeep != null && housekeep.size() > 0) {
+            log.info("housekeep = " + housekeep);
+            for (String taskId : housekeep) {
+                Integer tId = Integer.parseInt(taskId);
+                log.info("Removing housekept id:" + tId);
+
+                synchronized (taskTable) {
+                    taskTable.removeItem(tId);
+                }
+
+                pusher.push();
+            }
+            return;
+
+        }
+
         List<String> taskIds = params.get("id");
 
         if (taskIds == null) {
-            System.out.println("No taskIds provideds");
+            log.info("No taskIds provideds");
             return;
         }
 
@@ -211,19 +235,27 @@ public class TranscodePanel extends VerticalLayout {
 
             Item row = taskTable.getItem(tId);
 
+            if (null == row) {
+                int i = tId;
+                taskTable.addItem(new Object[]{
+                        new Integer(i), "-", "-", "untitled", "pending", "-", 0}, new Integer(i)
+                );
+                row = taskTable.getItem(tId);
+            }
+
             for (String key : params.keySet()) {
                 if (key.equals("id")) {
                     continue;
                 }
 
                 String value = params.get(key).get(0);
-                System.out.println("Setting " + key + " to " + value);
+                log.info("Setting " + key + " to " + value);
 
                 Property p = taskTable.getContainerProperty(tId, key);
                 if (p != null) {
                     p.setValue(value);
                 } else {
-                    System.out.println("No field called " + key);
+                    log.info("No field called " + key);
                 }
             }
         }

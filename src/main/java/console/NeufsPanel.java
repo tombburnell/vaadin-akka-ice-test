@@ -42,7 +42,7 @@ public class NeufsPanel extends VerticalLayout {
         fileChangeTable.addContainerProperty("id", Integer.class, null);
         fileChangeTable.addContainerProperty("change", String.class, null);
         fileChangeTable.setWidth("300");
-        fileChangeTable.sort(new Object[]{"id"}, new boolean[]{true});
+        fileChangeTable.sort(new Object[]{"id"}, new boolean[]{false});
 
 
         // Create an actor to listen to monitor for updates via JMS topic
@@ -60,7 +60,6 @@ public class NeufsPanel extends VerticalLayout {
                         Message msg = (Message) message;
                         log.info("Got message about file: " + msg);
                         final String body = (String) msg.getBodyAs(String.class);
-                        //     String filename = (String) msg.getHeader("CamelFileName");
                         String filename = body;
 
                         Integer y;
@@ -72,14 +71,12 @@ public class NeufsPanel extends VerticalLayout {
 
                         log.info("Got message about file: " + filename + "adding as id" + y);
 
-//                        Integer lastId = (Integer) dashTable.lastItemId();
-//                        if (null == lastId) lastId= 0;
-                        synchronized (getApplication()) {
-                            System.out.println("table=" + fileChangeTable + " y=" + y + "file = " + filename);
-                            fileChangeTable.addItem(new Object[]{y, filename}, new Integer(y));
-                            fileChangeTable.sort();
+//                        synchronized (getApplication()) {
+                        log.info("table=" + fileChangeTable + " y=" + y + "file = " + filename);
+                        fileChangeTable.addItem(new Object[]{y, filename}, new Integer(y));
+                        fileChangeTable.sort();
 
-                        }
+//                        }
 
                         log.info("Now there are " + fileChangeTable.size() + " rows");
                         pusher.push();

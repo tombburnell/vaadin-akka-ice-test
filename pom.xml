@@ -179,11 +179,11 @@
             <url>http://multiverse.googlecode.com/svn/maven-repository/releases/</url>
         </repository>
 
-        <repository>
-            <id>GuiceyFruit</id>
-            <name>GuiceyFruit Maven2 Repository</name>
-            <url>http://guiceyfruit.googlecode.com/svn/repo/releases/</url>
-        </repository>
+        <!--<repository>-->
+        <!--<id>GuiceyFruit</id>-->
+        <!--<name>GuiceyFruit Maven2 Repository</name>-->
+        <!--<url>http://guiceyfruit.googlecode.com/svn/repo/releases/</url>-->
+        <!--</repository>-->
 
         <repository>
             <id>JBoss</id>
@@ -263,11 +263,11 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>2.0</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>com.google.inject</groupId>-->
+        <!--<artifactId>guice</artifactId>-->
+        <!--<version>2.0</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>

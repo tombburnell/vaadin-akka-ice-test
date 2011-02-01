@@ -9,13 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.artur.icepush.ICEPush;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tom
- * Date: Jan 26, 2011
- * Time: 10:59:14 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class DashPanel extends VerticalLayout {
 
     Logger log = LoggerFactory.getLogger(DashPanel.class);
@@ -94,14 +88,11 @@ public class DashPanel extends VerticalLayout {
 
         queueTable.setCellStyleGenerator(new Table.CellStyleGenerator() {
             public String getStyle(Object itemId, Object propertyId) {
-                System.out.println("getStyle: " + itemId + " " + propertyId);
 
                 int row = ((Integer) itemId).intValue();
 
                 if (null != propertyId) {
                     String col = (String) propertyId;
-
-                    System.out.println("cell-style-gen: " + row);
 
                     if (col == "Depth") {
                         Integer val = (Integer) queueTable.getContainerProperty(itemId, propertyId).getValue();
