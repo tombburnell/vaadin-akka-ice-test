@@ -22,9 +22,13 @@ public class MyConsumerActor extends UntypedConsumerActor {
 
     Logger log = LoggerFactory.getLogger(MyConsumerActor.class);
 
-    public MyConsumerActor() {
-        messageLog = CouchDBStorage.newVector("messageLog");
+    Boolean persist = false;
 
+    public MyConsumerActor(Boolean persist) {
+        if (persist) {
+            messageLog = CouchDBStorage.newVector("messageLog");
+            this.persist = true;
+        }
     }
 
     public String getEndpointUri() {
@@ -34,9 +38,10 @@ public class MyConsumerActor extends UntypedConsumerActor {
 
     public void onReceive(Object message) {
         Message msg = (Message) message;
-        final String body = msg.getBodyAs(String.class);
+        String b = msg.getBodyAs(String.class);
+        final String body = b.replaceAll("\\n", "");
 
-        System.out.println(String.format("received %s", body));
+//        System.out.println(String.format("received %s", body));
 
         Map<String, List<String>> params = null;
         try {
@@ -48,19 +53,21 @@ public class MyConsumerActor extends UntypedConsumerActor {
         }
 
         // Write to persistent STM messageLog on CouchDB
-        new Atomic() {
-            public Object atomically() {
-                try {
-                    messageLog.add(body.getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    log.info("Failed to add to messageLog");
-                    e.printStackTrace();
+        if (persist) {
+            new Atomic() {
+                public Object atomically() {
+                    try {
+                        messageLog.add(body.getBytes("UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        log.info("Failed to add to messageLog");
+                        e.printStackTrace();
+                    }
+                    return null;
                 }
-                return null;
-            }
-        }.execute();
+            }.execute();
+        }
 
-        getContext().replySafe(String.format("Hello %s\n", body));
+        getContext().replySafe(String.format("Affirmative! %s\n", body));
 
     }
 

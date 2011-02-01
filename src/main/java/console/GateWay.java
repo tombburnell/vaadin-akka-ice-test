@@ -41,7 +41,7 @@ public class GateWay {
         // Create CamelContext with Spring-based registry and custom route builder
         CamelContextManager.init(new DefaultCamelContext(
                 new ApplicationContextRegistry(
-                        new ClassPathXmlApplicationContext("appContext.xml", ConsoleDemo.class)
+                        new ClassPathXmlApplicationContext("../appContext.xml", GateWay.class)
                 ))
         );
 
@@ -77,7 +77,7 @@ public class GateWay {
                 return new UntypedConsumerActor() {
 
                     public String getEndpointUri() {
-                        return "jms:topic:yo";
+                        return "jms:topic:zone2";
                     }
 
                     public void onReceive(final Object message) {

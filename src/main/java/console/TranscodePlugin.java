@@ -8,6 +8,8 @@ import akka.camel.CamelContextManager;
 import akka.camel.Message;
 import akka.camel.UntypedConsumerActor;
 import akka.camel.UntypedProducerActor;
+import akka.dispatch.Future;
+import akka.japi.Procedure;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spring.spi.ApplicationContextRegistry;
 import org.slf4j.Logger;
@@ -45,7 +47,6 @@ public class TranscodePlugin {
                     public boolean isOneway() {
                         return true;
                     }
-
                 };
             }
         });
@@ -78,7 +79,6 @@ public class TranscodePlugin {
 
                         log.info("action='" + action + "' id=" + id);
 
-//                        if ("created" == action) {
                         if (action.equals("created")) {
 
                             startTranscode(id);
@@ -90,8 +90,6 @@ public class TranscodePlugin {
                         } else {
                             log.info("action '" + action + "' not recognised");
                         }
-
-
                     }
                 };
             }
@@ -121,12 +119,29 @@ public class TranscodePlugin {
                             Thread.sleep(400);
 
                         }
+                        getContext().replyUnsafe(" finished! " + getContext().getUuid());
+
+                    }
+
+                    public void postStop() {
+                        log.info("I've been told to stop..");
                     }
                 };
             }
         });
         transcodeActor.start();
-        transcodeActor.sendOneWay(id);
+
+        Future f = transcodeActor.sendRequestReplyFuture(id);
+        Procedure<Future> procedure = new Procedure<Future>() {
+
+            public void apply(Future future) {
+                log.info("got reply - stopping actor");
+                transcodeActor.stop();
+            }
+        };
+
+        f.onComplete(procedure);
+
     }
 
 

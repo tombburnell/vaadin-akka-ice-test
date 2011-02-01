@@ -32,18 +32,13 @@ public class TranscodePanel extends VerticalLayout {
 
     ICEPush pusher;
 
-
     public TranscodePanel(ICEPush icepush) {
-        //ICEPush icepush) {
-
         pusher = icepush;
 
         // Add a button for starting some example background work
         this.addComponent(new Button("Do stuff in the background", new Button.ClickListener() {
-            public void buttonClick(Button.ClickEvent
-                    event) {
+            public void buttonClick(Button.ClickEvent event) {
                 TranscodePanel.this.addComponent(new Label("Waiting for background process to complete..."));
-                // trigger thread when we click it
                 new BackgroundThread().start();
             }
         }));
@@ -55,7 +50,6 @@ public class TranscodePanel extends VerticalLayout {
 
         taskTable.setWidth(400, Sizeable.UNITS_PIXELS);
         taskTable.setSizeFull();
-        // increase from default of 2 to smooth out scrolling
         // taskTable.setCacheRate(5);
         transcodeTables.addComponent(taskTable);
 
@@ -70,9 +64,7 @@ public class TranscodePanel extends VerticalLayout {
 
         //Add some initial transcode data
         for (int i = 0; i < 1; i++) {
-            taskTable.addItem(new Object[]{
-                    //           new Integer(i), "v00" + i, "b00" + i, "Eastenders ep: " + i, "InProgress", "123", "0"}, new Integer(i)
-                    new Integer(i), "-", "-", "untitled", "pending", "-", 0}, new Integer(i)
+            taskTable.addItem(new Object[]{new Integer(i), "-", "-", "untitled", "pending", "-", 0}, new Integer(i)
             );
         }
         taskTable.setCellStyleGenerator(new TranscodeTableStyle() {
@@ -97,12 +89,11 @@ public class TranscodePanel extends VerticalLayout {
         //
 
 
-        // Lets create an Actor to Monitor for updates via REST
-
+        // create an Actor to Monitor for updates via REST
         ActorRef restActor = Actors.actorOf(new UntypedActorFactory() {
             public UntypedActor create() {
 
-                return new MyConsumerActor() {
+                return new MyConsumerActor(true) {
 
                     public String getEndpointUri() {
                         return "jetty:http://localhost:8012/camel/default";
@@ -117,15 +108,14 @@ public class TranscodePanel extends VerticalLayout {
 
         restActor.start();
 
-        // Lets create an Actor to Monitor for updates via REST
-
+        // create an Actor to Monitor for updates via REST
         ActorRef fileActor = Actors.actorOf(new UntypedActorFactory() {
             public UntypedActor create() {
 
-                return new MyConsumerActor() {
+                return new MyConsumerActor(true) {
 
                     public String getEndpointUri() {
-                        return "file:/tmp/input";
+                        return "file:/Users/tom/camel";
                     }
 
                     public void processParams(Map<String, List<String>> params) {
@@ -138,11 +128,10 @@ public class TranscodePanel extends VerticalLayout {
         fileActor.start();
 
         // Create an actor to listen to monitor for updates via JMS topic
-
         ActorRef jmsActor = Actors.actorOf(new UntypedActorFactory() {
             public UntypedActor create() {
 
-                return new MyConsumerActor() {
+                return new MyConsumerActor(false) {
 
                     public String getEndpointUri() {
                         return "jms:topic:forge";
@@ -165,7 +154,7 @@ public class TranscodePanel extends VerticalLayout {
 
                 return new UntypedProducerActor() {
                     public String getEndpointUri() {
-                        return "jms:topic:forge";
+                        return "jms:topic:zone2";
                     }
 
                     @Override
@@ -202,20 +191,16 @@ public class TranscodePanel extends VerticalLayout {
     */
 
     DateTime lastTime = new DateTime();
-    Integer interval = 0;
 
     public void updateTable(Map<String, List<String>> params) {
 
         List<String> housekeep = params.get("housekeep");
         if (housekeep != null && housekeep.size() > 0) {
-            log.info("housekeep = " + housekeep);
             for (String taskId : housekeep) {
                 Integer tId = Integer.parseInt(taskId);
                 log.info("Removing housekept id:" + tId);
 
-                synchronized (taskTable) {
-                    taskTable.removeItem(tId);
-                }
+                taskTable.removeItem(tId);
 
                 pusher.push();
             }
@@ -260,6 +245,7 @@ public class TranscodePanel extends VerticalLayout {
             }
         }
 
+        Integer interval = 0;
         DateTime now = new DateTime();
         if (now.getSecondOfDay() >= lastTime.getSecondOfDay() + interval) {
             // push the updates to the view
